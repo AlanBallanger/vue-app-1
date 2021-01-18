@@ -9,28 +9,92 @@
 </head>
 <body>
 	<div id="demo">
-		<!-- <pre>{{commits}}</pre> -->
-		<h1>Latest Vue.js Commits</h1>
+		<h1>Star wars API using</h1>
 
-		<pre>{{commits}}</pre>
+		<!-- <pre>{{characters}}</pre> -->
 
+		<input type="text" v-model="searchInt" placeholder="Taille en cm">
+
+		<ul>
+			<img src="http://img1.wikia.nocookie.net/__cb20130621175844/starwars/images/6/6f/Anakin_Skywalker_RotS.png" alt="Girl in a jacket" width="150" height="180"><br>
+			<br><li v-for="character in filteredLengths">
+				<span>Nom: {{ character.name }} --- Taille : {{character.height}} --- Poids : {{character.mass}}</span>
+				
+			</li>
+		</ul>
 
 		
+		<input type="text" v-model="searchString" placeholder="Caracteres dans le nom">
+
+		<ul>
+			<li v-for="name in filteredNames">
+				<span>{{ name.name }}</span>
+			</li>
+		</ul>
 	</div>
 
-
-	
 	<script src="https://unpkg.com/axios/dist/axios.min.js"></script>
 	<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
 	<script>
-		const apiURL = 'https://swapi.dev/'
+		const apiURL = 'https://swapi.dev/api/people/'
 
 		const demo = new Vue({
 			el: '#demo',
 			data: {
+				characters: [],
+				names: [],
+				searchInt: null,
+				searchString: ""
+			},
+			created: function () {
+				this.fetchData()
 			},
 			methods: {
-		  	}
+				fetchData: async function () {
+					try {
+					  	const response = await axios.get(apiURL)
+						console.log(response.data)
+						this.characters = response.data 
+						this.names = response.data 
+					} catch (error) {
+						console.log(error);
+					}
+				}
+			  },
+			computed: {
+				filteredLengths: function () {
+					var characters_array = this.characters.results
+					searchInt = this.searchInt;
+
+					
+					if(!searchInt){
+						return characters_array;
+					}
+
+					characters_array = characters_array.filter(function(item){
+						if(parseInt(item.height) >= parseInt(searchInt)){
+							return item;
+						}
+					})
+					return characters_array;
+				},
+
+				filteredNames: function () {
+					var names_array = this.names.results
+					searchString = this.searchString;
+
+					if(!searchString){
+						return names_array;
+					}
+
+					names_array = names_array.filter(function(item){
+						if(item.name.includes(searchString)){
+							return item;
+						}
+					})
+					return names_array;
+				}
+    		}
 		})
 	</script>
 </body>
